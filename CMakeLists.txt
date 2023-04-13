@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(tddProject LANGUAGES CXX)
 
-set(UNITTEST=ON)
+set(UNITTEST ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -25,6 +25,9 @@ endif()
 
 add_subdirectory(TestTask/libs/printer)
 
+include_directories("TestTask/libs/complex/include")
+add_subdirectory(TestTask/libs/complex)
+
 
 if(UNITTEST)
         message(" output lib dir " ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG})
@@ -35,6 +38,7 @@ endif()
 add_executable(tddProject main.cpp)
 
 target_link_libraries(${PROJECT_NAME} Printer)
+target_link_libraries(${PROJECT_NAME} Complex)
 
 if(UNIX)
         add_custom_target( distclean COMMAND find . -name *_automoc.cpp -type f -delete
