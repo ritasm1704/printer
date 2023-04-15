@@ -1,33 +1,40 @@
 #ifndef COMPLEX_H
 #define COMPLEX_H
 
+#include <math.h>
+
 template<typename Type>
 
 class Complex {
 
 public:
 
-    Complex(Type re, Type im) : re(re), im(im) {
+    Complex(Type re = 0, Type im = 0) : re(re), im(im) {
+
     };
 
     ~Complex() {
 
     };
 
-    const Type& Re() const {
+    const Type& getRe() const {
         return this->re;
     };
 
-    Type& Re() {
+    Type& getRe() {
         return this->re;
     };
 
-    const Type& Im() const {
+    const Type& getIm() const {
         return this->im;
     };
 
-    Type& Im(){
+    Type& getIm(){
         return this->im;
+    };
+
+    double abs() {
+        return sqrt(re * re + im * im);
     };
 
     
