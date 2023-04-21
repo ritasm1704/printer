@@ -33,9 +33,29 @@ public:
         return this->im;
     };
 
-    double abs() {
+    Type abs() {
         return sqrt(re * re + im * im);
     };
+
+    Type arg() {
+        if (re > 0 && im > 0) {
+            return atan(im / re);
+        } else if (re < 0 && im > 0) {
+            return atan(im / re) + M_PI;
+        } else if (re < 0 && im < 0) {
+            return atan(im / re) - M_PI;
+        } else if (re > 0 && im < 0) {
+            return atan(im / re);
+        }
+    }
+
+    Type argDeg() {
+        return arg() * 180 / M_PI;
+    }
+
+    Complex<Type> conj() {
+        return Complex<Type>(re, -im);
+    }
 
     
 
