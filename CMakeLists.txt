@@ -27,6 +27,8 @@ add_subdirectory(TestTask/libs/printer)
 
 include_directories("TestTask/libs/complex/include")
 add_subdirectory(TestTask/libs/complex)
+include_directories("TestTask/libs/threads/include")
+add_subdirectory(TestTask/libs/threads)
 
 
 if(UNITTEST)
@@ -39,6 +41,7 @@ add_executable(tddProject main.cpp)
 
 target_link_libraries(${PROJECT_NAME} Printer)
 target_link_libraries(${PROJECT_NAME} Complex)
+target_link_libraries(${PROJECT_NAME} Threads)
 
 if(UNIX)
         add_custom_target( distclean COMMAND find . -name *_automoc.cpp -type f -delete
