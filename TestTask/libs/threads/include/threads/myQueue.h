@@ -8,13 +8,18 @@
 template <typename Type>
 class MyQueue
 {
+private:
     std::queue<Type> buf_queue;
     std::mutex mtx;
 
+public:
+    MyQueue() {
 
+    }
+    
     void put(Type value) {
         std::unique_lock<std::mutex> lck(mtx);
-        if (buf_queue.size >= 256) {
+        if (buf_queue.size() >= 256) {
             throw "queue overflow";
         } else {
             buf_queue.push(value);
