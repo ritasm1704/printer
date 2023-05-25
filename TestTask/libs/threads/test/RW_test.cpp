@@ -4,20 +4,27 @@
 
 TEST(RW_Test, RunningTest) {
 
-    std::shared_ptr<MyQueue<DataMsg>> mq;
-    std::shared_ptr<Reader> r = std::make_shared<Reader>(mq);
-    std::shared_ptr<Writer> w = std::make_shared<Writer>(mq);
+    std::condition_variable cv;
+    MyQueue<DataMsg> mq;
+    std::shared_ptr<Reader> r = std::make_shared<Reader>(cv, mq);
+    std::shared_ptr<Writer> w = std::make_shared<Writer>(cv, mq);
     
-
+    size_t s = 500;
+    int ex = -1;
     std::thread reader_thread([&]{
-        r->read(10, 10);
+        ex = r->read(1000, s);
+        if (ex == 1) {
+            w->reading_is_stopped = true;
+            cv.notify_one();
+        }
     });
 
     std::thread writer_thread([&]{
-        w->write(10);
+        w->write(s);
     });
 
     reader_thread.join();
+    
     writer_thread.join();
 
 }

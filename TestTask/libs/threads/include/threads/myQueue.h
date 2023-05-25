@@ -5,6 +5,9 @@
 #include <mutex>
 #include <condition_variable>
 
+class QueueOverflow {
+};
+
 template <typename Type>
 class MyQueue
 {
@@ -16,11 +19,13 @@ public:
     MyQueue() {
 
     }
-    
+
     void put(Type value) {
         std::unique_lock<std::mutex> lck(mtx);
+        //std::cout << buf_queue.size() << std::endl;
         if (buf_queue.size() >= 256) {
-            throw "queue overflow";
+            std::cout << "!!!" << std::endl;
+            throw QueueOverflow();
         } else {
             buf_queue.push(value);
         }
