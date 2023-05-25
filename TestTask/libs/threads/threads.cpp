@@ -9,17 +9,25 @@
 #include "threads/reader.h"
 #include "threads/writer.h"
 
-int main() {
+int main(int argc, char *argv[]) {
  
+    if (argc < 2) {
+        std::cout << "incorrect input" << std::endl;
+    } 
+    int time_per_sec;
+    sscanf(argv[1], "%d", &time_per_sec);
+    int size;
+    sscanf(argv[2], "%d", &size);
+
+    std::cout << "time_per_sec = " << time_per_sec << ", size = " << size << "Mb" << std::endl;
     std::condition_variable cv;
     MyQueue<DataMsg> mq;
     std::shared_ptr<Reader> r = std::make_shared<Reader>(cv, mq);
     std::shared_ptr<Writer> w = std::make_shared<Writer>(cv, mq);
     
-    size_t s = 500;
     int ex = -1;
     std::thread reader_thread([&]{
-        ex = r->read(1000, s);
+        ex = r->read(time_per_sec, size);
         if (ex == 1) {
             w->reading_is_stopped = true;
             cv.notify_one();
@@ -27,7 +35,7 @@ int main() {
     });
 
     std::thread writer_thread([&]{
-        w->write(s);
+        w->write(size);
     });
 
     reader_thread.join();

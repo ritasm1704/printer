@@ -38,6 +38,7 @@ endif()
 
 
 add_executable(tddProject main.cpp)
+add_executable(threadsProg TestTask/libs/threads/threads.cpp)
 
 target_link_libraries(${PROJECT_NAME} Printer)
 target_link_libraries(${PROJECT_NAME} Complex)
