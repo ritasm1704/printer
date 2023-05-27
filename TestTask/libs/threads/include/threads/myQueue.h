@@ -22,9 +22,7 @@ public:
 
     void put(Type value) {
         std::unique_lock<std::mutex> lck(mtx);
-        //std::cout << buf_queue.size() << std::endl;
         if (buf_queue.size() >= 256) {
-            std::cout << "!!!" << std::endl;
             throw QueueOverflow();
         } else {
             buf_queue.push(value);

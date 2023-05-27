@@ -15,32 +15,31 @@ private:
     std::condition_variable &cv;
     std::vector<uint8_t> buffer;
     MyQueue<DataMsg> &q;
+    bool &reading_is_stopped;
+    size_t data_size;
     size_t size_bloc; //1 байт, который передаем второму потоку
 
 public:
-    Reader(std::condition_variable &cv_, MyQueue<DataMsg> &q_, size_t size_bloc_ = 1000'000) : cv(cv_), q(q_), size_bloc(size_bloc_) {
-
-    }
-
-    
-    int read(int times_per_sec, size_t size) {
+    Reader(std::condition_variable &cv_, MyQueue<DataMsg> &q_, bool &reading_is_stopped_, size_t data_size_, size_t size_bloc_ = 1000'000) : 
+    cv(cv_), q(q_), reading_is_stopped(reading_is_stopped_), data_size(data_size_), size_bloc(size_bloc_) {
 
         buffer.resize(256*1000'000*sizeof(uint8_t));
         size_t count = 0;
-        for (int i = 0; i < size; i++) {
-            //std::cout << "Thread-read - " << i << std::endl;
+        for (int i = 0; i < data_size; i++) {
             for (int j = 0; j < size_bloc; j++) {
                 buffer[count] = (uint8_t)(count);
-                //std::cout  << count << " ";
                 count += 1;
                 count %= 256;
             }
-            //std::cout << std::endl;
         }
+    }
+
+    
+    void read(int times_per_sec) {
 
         uint8_t* start = buffer.data();
         std::cout << "Thread-read start - " << (unsigned)*start << " " << (unsigned)*(start + 1) << std::endl;
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < data_size; i++) {
             DataMsg dm;
             dm.offset = start;
             dm.size = size_bloc;
@@ -49,8 +48,10 @@ public:
                 q.put(dm);
             } catch(const QueueOverflow& e)
             {
+                reading_is_stopped = true;
+                cv.notify_one();  
                 std::cout << "queue overflow" << std::endl;
-                return 1;
+                break;
             }
             
             start += size_bloc;
@@ -59,7 +60,6 @@ public:
             std::this_thread::sleep_for(std::chrono::milliseconds(1000/times_per_sec));
         }
         std::cout << "Thread-read in out" << std::endl;
-        return 0;
     }
 };
 

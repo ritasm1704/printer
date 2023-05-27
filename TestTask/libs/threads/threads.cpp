@@ -19,19 +19,15 @@ int main(int argc, char *argv[]) {
     int size;
     sscanf(argv[2], "%d", &size);
 
-    std::cout << "time_per_sec = " << time_per_sec << ", size = " << size << "Mb" << std::endl;
+    std::cout << "time_per_sec = " << time_per_sec << ", data size = " << size << "Mb" << std::endl;
     std::condition_variable cv;
     MyQueue<DataMsg> mq;
-    std::shared_ptr<Reader> r = std::make_shared<Reader>(cv, mq);
-    std::shared_ptr<Writer> w = std::make_shared<Writer>(cv, mq);
+    bool reading_is_stopped = false;
+    std::unique_ptr<Reader> r = std::make_unique<Reader>(cv, mq, reading_is_stopped, size);
+    std::unique_ptr<Writer> w = std::make_unique<Writer>(cv, mq, reading_is_stopped);
     
-    int ex = -1;
     std::thread reader_thread([&]{
-        ex = r->read(time_per_sec, size);
-        if (ex == 1) {
-            w->reading_is_stopped = true;
-            cv.notify_one();
-        }
+        r->read(time_per_sec);
     });
 
     std::thread writer_thread([&]{
