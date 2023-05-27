@@ -23,8 +23,11 @@ int main(int argc, char *argv[]) {
     std::condition_variable cv;
     MyQueue<DataMsg> mq;
     bool reading_is_stopped = false;
-    std::unique_ptr<Reader> r = std::make_unique<Reader>(cv, mq, reading_is_stopped, size);
-    std::unique_ptr<Writer> w = std::make_unique<Writer>(cv, mq, reading_is_stopped);
+
+    ReadingStatus rs;
+    rs = ReadingStatus::reading_continues;
+    std::unique_ptr<Reader> r = std::make_unique<Reader>(cv, mq, rs, size);
+    std::unique_ptr<Writer> w = std::make_unique<Writer>(cv, mq, rs);
     
     std::thread reader_thread([&]{
         r->read(time_per_sec);

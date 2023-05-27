@@ -14,11 +14,11 @@ private:
     std::condition_variable &cv;
     std::mutex mtx;
     MyQueue<DataMsg> &q;
-    bool &reading_is_stopped;
+    ReadingStatus &rs;
 
 public:
 
-    Writer(std::condition_variable &cv_, MyQueue<DataMsg> &q_, bool &reading_is_stopped_) : cv(cv_), q(q_), reading_is_stopped(reading_is_stopped_) {
+    Writer(std::condition_variable &cv_, MyQueue<DataMsg> &q_, ReadingStatus &rs_) : cv(cv_), q(q_), rs(rs_) {
         
     }
 
@@ -34,13 +34,13 @@ public:
             std::unique_lock<std::mutex> lck(mtx);
             while (q.isEmpty())
             {
-                if (reading_is_stopped) {
+                if (rs == ReadingStatus::reading_is_stopped) {
                     break;
                 }
                 //std::cout << "Thread-write is weiting" << std::endl;
                 cv.wait(lck);
             }
-            if (reading_is_stopped) {
+            if (rs == ReadingStatus::reading_is_stopped) {
                 break;
             }
             //std::cout << "Thread-write " << count << std::endl;
@@ -64,7 +64,7 @@ public:
 
         time(&end);
         double time_taken = double(end - start);
-        if (reading_is_stopped) {
+        if (rs == ReadingStatus::reading_is_stopped) {
             std::cout << "impossible to calculate the speed" << std::endl;
         } else {
             std::cout << "write speed: "<< size / time_taken << "Mb/sec" << std::endl;

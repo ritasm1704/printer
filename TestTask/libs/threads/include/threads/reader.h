@@ -15,13 +15,13 @@ private:
     std::condition_variable &cv;
     std::vector<uint8_t> buffer;
     MyQueue<DataMsg> &q;
-    bool &reading_is_stopped;
+    ReadingStatus &rs;
     size_t data_size;
     size_t size_bloc; //1 байт, который передаем второму потоку
 
 public:
-    Reader(std::condition_variable &cv_, MyQueue<DataMsg> &q_, bool &reading_is_stopped_, size_t data_size_, size_t size_bloc_ = 1000'000) : 
-    cv(cv_), q(q_), reading_is_stopped(reading_is_stopped_), data_size(data_size_), size_bloc(size_bloc_) {
+    Reader(std::condition_variable &cv_, MyQueue<DataMsg> &q_, ReadingStatus &rs_, size_t data_size_, size_t size_bloc_ = 1000'000) : 
+    cv(cv_), q(q_), rs(rs_), data_size(data_size_), size_bloc(size_bloc_) {
 
         buffer.resize(256*1000'000*sizeof(uint8_t));
         size_t count = 0;
@@ -48,7 +48,7 @@ public:
                 q.put(dm);
             } catch(const QueueOverflow& e)
             {
-                reading_is_stopped = true;
+                rs = ReadingStatus::reading_is_stopped;
                 cv.notify_one();  
                 std::cout << "queue overflow" << std::endl;
                 break;

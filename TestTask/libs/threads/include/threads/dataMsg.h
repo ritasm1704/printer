@@ -9,4 +9,6 @@ public:
 
 };
 
+enum class ReadingStatus {reading_continues, reading_is_stopped};
+
 #endif
