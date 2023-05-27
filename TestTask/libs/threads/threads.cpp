@@ -22,10 +22,9 @@ int main(int argc, char *argv[]) {
     std::cout << "time_per_sec = " << time_per_sec << ", data size = " << size << "Mb" << std::endl;
     std::condition_variable cv;
     MyQueue<DataMsg> mq;
-    bool reading_is_stopped = false;
-
     ReadingStatus rs;
     rs = ReadingStatus::reading_continues;
+    
     std::unique_ptr<Reader> r = std::make_unique<Reader>(cv, mq, rs, size);
     std::unique_ptr<Writer> w = std::make_unique<Writer>(cv, mq, rs);
     
